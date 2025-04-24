@@ -25,9 +25,10 @@ services:
       - $config_path:/config
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
+    ports:
+      - "8123:8123"  # Maps host port 8123 to container port 8123
     restart: unless-stopped
     privileged: true
-    network_mode: host
 EOF
 
 echo "The docker-compose.yaml has been created successfully."
