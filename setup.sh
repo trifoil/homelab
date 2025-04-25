@@ -31,7 +31,7 @@ display_menu() {
     echo "| 15. Setup Vanilla JS Website                                          |"
     echo "| 16. Setup DDNS Updater                                                |"
     echo "| 17. Setup SOTF (sons of the forest) Server                            |"
-    echo "| 18. Setup Dead Man's Switch                                            |"
+    echo "| 18. Setup Dead Man's Switch                                           |"
     echo "|-----------------------------------------------------------------------|"
     echo "|  q. Exit                                                              |"
     echo "|-----------------------------------------------------------------------|"
