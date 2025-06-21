@@ -97,3 +97,10 @@ User services :
 | Dead Man's Switch             | 3000                                      |
 | Vaultwarden                   | 8081                                      |
 
+## Default Credentials
+
+| Service               | Username / Email      | Password                                                 |
+| --------------------- | --------------------- | -------------------------------------------------------- |
+| NGINX Proxy Manager   | `admin@example.com`   | `changeme`                                               |
+| FileBrowser           | `admin`               | Shown in the docker logs on first container start.       |
+
