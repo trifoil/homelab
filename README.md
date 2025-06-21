@@ -53,18 +53,24 @@ Installed from the script and ```required``` for the other services :
 Admin services :
 
 - [x] Portainer
+- [x] Traefik
 - [x] Nginx Proxy Manager
 - [x] DDNS updater
 - [ ] Uptime-kuma
 - [x] FileBrowser
-- [ ] OpenVPN
+- [x] Vaultwarden
+- [x] Dead Man's Switch
 
 User services :
 
+- [x] WireGuard VPN
+- [ ] Obfuscated WireGuard VPN
+- [x] HomeAssistant
 - [x] Nextcloud AIO
-- [x] Jellyfin
-- [x] Deluge
-- [ ] Gitbucket
+- [x] GitBucket
+- [x] Streaming (Deluge + Jellyfin)
+- [x] Vanilla JS Website
+- [x] SOTF (Sons of the Forest) Server
 
 ## Sources
 
