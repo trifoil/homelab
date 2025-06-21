@@ -6,8 +6,6 @@ echo "The script will now install Nextloud AIO"
 echo "Updating ... "
 dnf update -y
 
-#!/bin/bash
-
 # Default values
 DEFAULT_VOLUME_LOCATION="/storage/aio"
 DEFAULT_PASSWORD="changeme"
@@ -46,9 +44,7 @@ volumes:
     name: nextcloud_aio_mastercontainer 
 EOF
 
-echo "docker-compose.yaml file has been generated successfully."
-
-echo "The docker-compose.yml has been created successfully."
+echo "The docker-compose.yaml has been created successfully."
 
 docker compose up -d
 docker ps

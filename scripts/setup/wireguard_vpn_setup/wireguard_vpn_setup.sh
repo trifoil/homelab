@@ -18,7 +18,6 @@ volume_data=$(prompt "Enter the volume for unobfuscated wireguard vpn" "/storage
 dnf install -y dnf-plugins-core -y
 dnf install wireguard-tools -y
 modprobe wireguard
-mkdir -p /path/to/wireguard/config
 docker pull lscr.io/linuxserver/wireguard:latest
 cat <<EOF >docker-compose.yaml
 services:

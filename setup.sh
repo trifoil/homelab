@@ -17,21 +17,18 @@ display_menu() {
     echo "|  1. Setup Portainer                                                   |"
     echo "|  2. Setup Traefik                                                     |"
     echo "|  3. Setup NGINX Proxy Manager                                         |"
-    echo "|  4. Setup Pi-hole                                                     |"
-    echo "|  5. Setup WireGuard VPN                                               |"
-    echo "|  6. Setup Obfuscated WireGuard VPN                                    |"
-    echo "|  7. Setup HomeAssistant                                               |"
-    echo "|  8. Setup Nextcloud AIO                                               |"
-    echo "|  9. Setup GitBucket                                                   |"
-    echo "| 10. Setup Matrix Server                                               |"
-    echo "| 11. Setup Alternative Monitoring Tool (e.g., Prometheus, Grafana)     |"
-    echo "| 12. Setup Vaultwarden                                                 |"
-    echo "| 13. Setup FileBrowser                                                 |"
-    echo "| 14. Setup Streaming (deluge + jellyfin)                               |"
-    echo "| 15. Setup Vanilla JS Website                                          |"
-    echo "| 16. Setup DDNS Updater                                                |"
-    echo "| 17. Setup SOTF (sons of the forest) Server                            |"
-    echo "| 18. Setup Dead Man's Switch                                           |"
+    echo "|  4. Setup WireGuard VPN                                               |"
+    echo "|  5. Setup Obfuscated WireGuard VPN                                    |"
+    echo "|  6. Setup HomeAssistant                                               |"
+    echo "|  7. Setup Nextcloud AIO                                               |"
+    echo "|  8. Setup GitBucket                                                   |"
+    echo "|  9. Setup FileBrowser                                                 |"
+    echo "| 10. Setup Streaming (deluge + jellyfin)                               |"
+    echo "| 11. Setup Vanilla JS Website                                          |"
+    echo "| 12. Setup DDNS Updater                                                |"
+    echo "| 13. Setup SOTF (sons of the forest) Server                            |"
+    echo "| 14. Setup Dead Man's Switch                                           |"
+    echo "| 15. Setup Vaultwarden                                                 |"
     echo "|-----------------------------------------------------------------------|"
     echo "|  q. Exit                                                              |"
     echo "|-----------------------------------------------------------------------|"
@@ -54,10 +51,6 @@ setup_traefik(){
     sh scripts/setup/traefik_setup/traefik_setup.sh
 }
 
-setup_pihole(){
-    sh scripts/setup/pihole_setup/pihole_setup.sh
-}
-
 setup_wireguard_vpn(){
     sh scripts/setup/wireguard_vpn_setup/wireguard_vpn_setup.sh
 }
@@ -76,18 +69,6 @@ setup_nextcloud_aio(){
 
 setup_gitbucket(){
     sh scripts/setup/gitbucket_setup/gitbucket_setup.sh
-}
-
-setup_matrix(){
-    sh scripts/setup/matrix_setup/matrix_setup.sh
-}
-
-setup_monitoring(){
-    sh scripts/setup/monitoring_setup/monitoring_setup.sh
-}
-
-setup_vaultwarden(){
-    sh scripts/setup/vaultwarden_setup/vaultwarden_setup.sh
 }
 
 setup_filebrowser(){
@@ -114,6 +95,10 @@ setup_dead_man_switch(){
     sh scripts/setup/dead_man_switch_setup/dead_man_switch_setup.sh
 }
 
+setup_vaultwarden(){
+    sh scripts/setup/vaultwarden_setup/vaultwarden_setup.sh
+}
+
 main() {
     while true; do
         display_menu
@@ -123,21 +108,18 @@ main() {
             1) setup_portainer ;;
             2) setup_traefik ;;
             3) setup_npm ;;
-            4) setup_pihole ;;
-            5) setup_wireguard_vpn ;;
-            6) setup_obfuscated_wireguard_vpn ;;
-            7) setup_homeassistant ;;
-            8) setup_nextcloud_aio ;;
-            9) setup_gitbucket ;;
-            10) setup_matrix ;;
-            11) setup_monitoring ;;
-            12) setup_vaultwarden ;;
-            13) setup_filebrowser ;;
-            14) setup_streaming ;;
-            15) setup_vanilla_js_website ;;
-            16) setup_ddns_updater ;;
-            17) setup_sotf ;;
-            18) setup_dead_man_switch ;;
+            4) setup_wireguard_vpn ;;
+            5) setup_obfuscated_wireguard_vpn ;;
+            6) setup_homeassistant ;;
+            7) setup_nextcloud_aio ;;
+            8) setup_gitbucket ;;
+            9) setup_filebrowser ;;
+            10) setup_streaming ;;
+            11) setup_vanilla_js_website ;;
+            12) setup_ddns_updater ;;
+            13) setup_sotf ;;
+            14) setup_dead_man_switch ;;
+            15) setup_vaultwarden ;;
             q) clear && echo "Bye loser!" && exit;;
             *) clear && echo "Invalid choice. Please enter a valid option." ;;
         esac

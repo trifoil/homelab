@@ -13,7 +13,7 @@ prompt() {
   echo "${input:-$default_value}"
 }
 
-volume_data=$(prompt "Enter the volume for obfuscated wireguard vpn" "/storage/deadmanswitch")
+volume_data=$(prompt "Enter the volume for the dead man's switch" "/storage/deadmanswitch")
 port=$(prompt "Enter the port number" "3000")
 mail_username=$(prompt "Enter your mail" "your-gmail-email@gmail.com")
 mail_password=$(prompt "Enter the mail password" "your-gmail-password")

@@ -76,3 +76,24 @@ User services :
 * https://github.com/pgollor/gitbucket-docker/blob/master/docker-compose.yml
 * https://ocserv.openconnect-vpn.net/packages
 
+## Default Ports
+
+| Service                       | Port(s)                                   |
+| ----------------------------- | ----------------------------------------- |
+| Portainer                     | 9443, 8000                                |
+| NGINX Proxy Manager           | 80, 443, 81                               |
+| WireGuard                     | 51820/udp                                 |
+| Obfuscated WireGuard (server) | 4431                                      |
+| Obfuscated WireGuard (client) | 51820/udp                                 |
+| Home Assistant                | 8123                                      |
+| Nextcloud AIO                 | 8080                                      |
+| GitBucket                     | 8080, 29418                               |
+| FileBrowser                   | 8086                                      |
+| Jellyfin                      | 8096                                      |
+| Deluge                        | 8112, 58846, 58946 (tcp/udp)              |
+| Vanilla JS Website            | 42069                                     |
+| DDNS Updater                  | 8094                                      |
+| SOTF Server                   | 8766/udp, 27016/udp, 9700/udp             |
+| Dead Man's Switch             | 3000                                      |
+| Vaultwarden                   | 8081                                      |
+
