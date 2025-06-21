@@ -71,6 +71,7 @@ User services :
 - [x] Streaming (Deluge + Jellyfin)
 - [x] Vanilla JS Website
 - [x] SOTF (Sons of the Forest) Server
+- [x] Static Website
 
 ## Default Ports
 
@@ -92,6 +93,7 @@ User services :
 | SOTF Server                   | 8766/udp, 27016/udp, 9700/udp             |
 | Dead Man's Switch             | 3000                                      |
 | Vaultwarden                   | 8081                                      |
+| Static Website                | 8082                                      |
 
 ## Default Credentials
 

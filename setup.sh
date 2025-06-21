@@ -29,6 +29,7 @@ display_menu() {
     echo "| 13. Setup SOTF (sons of the forest) Server                            |"
     echo "| 14. Setup Dead Man's Switch                                           |"
     echo "| 15. Setup Vaultwarden                                                 |"
+    echo "| 16. Setup Static Website                                              |"
     echo "|-----------------------------------------------------------------------|"
     echo "|  q. Exit                                                              |"
     echo "|-----------------------------------------------------------------------|"
@@ -99,6 +100,10 @@ setup_vaultwarden(){
     sh scripts/setup/vaultwarden_setup/vaultwarden_setup.sh
 }
 
+setup_static_website(){
+    sh scripts/setup/static_website_setup/static_website_setup.sh
+}
+
 main() {
     while true; do
         display_menu
@@ -120,6 +125,7 @@ main() {
             13) setup_sotf ;;
             14) setup_dead_man_switch ;;
             15) setup_vaultwarden ;;
+            16) setup_static_website ;;
             q) clear && echo "Bye loser!" && exit;;
             *) clear && echo "Invalid choice. Please enter a valid option." ;;
         esac
