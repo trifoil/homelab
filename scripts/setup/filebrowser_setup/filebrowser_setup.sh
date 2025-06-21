@@ -14,18 +14,14 @@ prompt() {
   echo "${input:-$default_value}"
 }
 
-filebrowser_volume=$(prompt "Enter the volume to be browsed" "/storage")
-filebrowser_database_path=$(prompt "Enter the path for the FileBrowser database file" "/storage/filebrowser/database.db")
-filebrowser_settings_path=$(prompt "Enter the path for the FileBrowser settings file" "/storage/filebrowser/.filebrowser.json")
+filebrowser_root_volume=$(prompt "Enter the root directory for FileBrowser to manage" "/storage")
+filebrowser_config_dir=$(prompt "Enter the directory for FileBrowser config files" "/storage/filebrowser")
 filebrowser_username=$(prompt "Enter your username" "admin")
 filebrowser_password=$(prompt "Enter your password" "changeme")
 filebrowser_port=$(prompt "Enter the port number" "8086")
 
-# Create directory for database and settings if it doesn't exist
-mkdir -p "$(dirname "$filebrowser_database_path")"
-mkdir -p "$(dirname "$filebrowser_settings_path")"
-touch "$filebrowser_database_path"
-touch "$filebrowser_settings_path"
+# Create directory for config files if it doesn't exist
+mkdir -p "$filebrowser_config_dir"
 
 
 cat <<EOF > docker-compose.yaml
@@ -33,11 +29,10 @@ services:
   filebrowser:
     image: filebrowser/filebrowser:latest
     container_name: file-manager
-    user: "$(id -u):$(id -g)"
     volumes:
-      - "$filebrowser_volume:/srv"
-      - "$filebrowser_database_path:/database.db"
-      - "$filebrowser_settings_path:/.filebrowser.json"
+      - "$filebrowser_root_volume:/srv"
+      - "$filebrowser_config_dir/database.db:/database.db"
+      - "$filebrowser_config_dir/.filebrowser.json:/.filebrowser.json"
     ports:
       - "$filebrowser_port:80"
     environment:
