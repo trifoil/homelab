@@ -22,7 +22,7 @@ STORAGE_PATH=$(prompt_with_default "Enter storage path" "/storage/portainer")
 docker volume create portainer_data
 docker run -d --privileged -p 9443:9443 -p 8000:8000 --name portainer --restart always \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    -v portainer_data:/data \
+    -v $STORAGE_PATH/data:/data \
     portainer/portainer-ce:latest
 
 # Pull and run the Watchtower image for automated updates
