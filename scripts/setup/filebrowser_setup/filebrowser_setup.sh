@@ -37,6 +37,6 @@ echo "The docker-compose.yaml has been created successfully."
 docker compose up -d
 docker ps
 
-echo "Default credentials are admin / admin"
+echo "Default credentials are admin / check the logs from the container"
 
 read -n 1 -s -r -p "Done. Press any key to continue..."

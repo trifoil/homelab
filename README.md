@@ -72,16 +72,6 @@ User services :
 - [x] Vanilla JS Website
 - [x] SOTF (Sons of the Forest) Server
 
-## Sources
-
-* https://github.com/louislam/uptime-kuma
-* https://github.com/pgollor/gitbucket-docker/tree/master
-* https://github.com/qdm12/ddns-updater/blob/master/docker-compose.yml
-* https://github.com/element-hq/synapse/blob/develop/contrib/docker/docker-compose.yml
-* https://github.com/OpenVPN/as-docker
-* https://github.com/pgollor/gitbucket-docker/blob/master/docker-compose.yml
-* https://ocserv.openconnect-vpn.net/packages
-
 ## Default Ports
 
 | Service                       | Port(s)                                   |
@@ -110,3 +100,12 @@ User services :
 | NGINX Proxy Manager   | `admin@example.com`   | `changeme`                                               |
 | FileBrowser           | `admin`               | Shown in the docker logs on first container start.       |
 
+## Sources
+
+* https://github.com/louislam/uptime-kuma
+* https://github.com/pgollor/gitbucket-docker/tree/master
+* https://github.com/qdm12/ddns-updater/blob/master/docker-compose.yml
+* https://github.com/element-hq/synapse/blob/develop/contrib/docker/docker-compose.yml
+* https://github.com/OpenVPN/as-docker
+* https://github.com/pgollor/gitbucket-docker/blob/master/docker-compose.yml
+* https://ocserv.openconnect-vpn.net/packages
