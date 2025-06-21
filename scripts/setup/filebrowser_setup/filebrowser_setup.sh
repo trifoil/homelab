@@ -15,8 +15,6 @@ prompt() {
 }
 
 filebrowser_volume=$(prompt "Enter the volume to be browsed" "/storage")
-filebrowser_username=$(prompt "Enter your username" "admin")
-filebrowser_password=$(prompt "Enter your password" "changeme")
 filebrowser_port=$(prompt "Enter the port number" "8086")
 
 
@@ -38,5 +36,7 @@ echo "The docker-compose.yaml has been created successfully."
 
 docker compose up -d
 docker ps
+
+echo "Default credentials are admin / admin"
 
 read -n 1 -s -r -p "Done. Press any key to continue..."
