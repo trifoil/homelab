@@ -14,6 +14,7 @@ prompt() {
   echo "${input:-$default_value}"
 }
 
+filebrowser_data=$(prompt "Enter the app data storage path" "/storage/filebrowser")
 filebrowser_volume=$(prompt "Enter the volume to be browsed" "/storage")
 filebrowser_port=$(prompt "Enter the port number" "8086")
 
@@ -24,7 +25,8 @@ services:
     image: filebrowser/filebrowser:latest
     container_name: file-manager
     volumes:
-      - $filebrowser_volume:/srv
+      - $filebrowser_data:/config
+      - $filebrowser_volume:/data
     ports:
       - "$filebrowser_port:80"
     environment:
