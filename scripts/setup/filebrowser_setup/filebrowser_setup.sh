@@ -30,6 +30,7 @@ services:
     environment:
       FB_BASEURL: "/"
     restart: unless-stopped
+    privileged: true
 EOF
 
 echo "The docker-compose.yaml has been created successfully."
