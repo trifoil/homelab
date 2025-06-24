@@ -22,6 +22,7 @@ filebrowser_port=$(prompt "Enter the port number" "8086")
 cat <<EOF > docker-compose.yaml
 services:
   filebrowser:
+    user: root
     image: filebrowser/filebrowser:latest
     container_name: file-manager
     volumes:
