@@ -30,6 +30,7 @@ display_menu() {
     echo "| 14. Setup Dead Man's Switch                                           |"
     echo "| 15. Setup Vaultwarden                                                 |"
     echo "| 16. Setup Static Website                                              |"
+    echo "| 17. Setup NPM Monitoring (Grafana + Loki + Promtail)                  |"
     echo "|-----------------------------------------------------------------------|"
     echo "|  q. Exit                                                              |"
     echo "|-----------------------------------------------------------------------|"
@@ -104,6 +105,10 @@ setup_static_website(){
     sh scripts/setup/static_website_setup/static_website_setup.sh
 }
 
+setup_npm_monitoring(){
+    sh scripts/setup/npm_monitoring_setup/npm_monitoring_setup.sh
+}
+
 main() {
     while true; do
         display_menu
@@ -126,6 +131,7 @@ main() {
             14) setup_dead_man_switch ;;
             15) setup_vaultwarden ;;
             16) setup_static_website ;;
+            17) setup_npm_monitoring ;;
             q) clear && echo "Bye loser!" && exit;;
             *) clear && echo "Invalid choice. Please enter a valid option." ;;
         esac
