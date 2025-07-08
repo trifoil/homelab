@@ -157,6 +157,22 @@ EOF
 # Create Grafana dashboard configuration
 echo "Creating Grafana dashboard configuration..."
 mkdir -p "$monitoring_data_path/grafana-dashboards"
+mkdir -p "$monitoring_data_path/grafana-dashboards/datasources"
+
+# Create datasource configuration
+cat <<EOF > "$monitoring_data_path/grafana-dashboards/datasources/ds.yaml"
+apiVersion: 1
+datasources:
+- name: Loki
+  type: loki
+  access: proxy 
+  orgId: 1
+  url: http://loki:3100
+  basicAuth: false
+  isDefault: true
+  version: 1
+  editable: false
+EOF
 
 cat <<EOF > "$monitoring_data_path/grafana-dashboards/dashboard-provider.yaml"
 apiVersion: 1
@@ -367,43 +383,10 @@ services:
     restart: unless-stopped
 
   grafana:
+    privileged: true
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
       - GF_AUTH_ANONYMOUS_ENABLED=false
-    entrypoint:
-      - sh
-      - -euc
-      - |
-        mkdir -p /etc/grafana/provisioning/datasources
-        mkdir -p /etc/grafana/provisioning/dashboards
-        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
-        apiVersion: 1
-        datasources:
-        - name: Loki
-          type: loki
-          access: proxy 
-          orgId: 1
-          url: http://loki:3100
-          basicAuth: false
-          isDefault: true
-          version: 1
-          editable: false
-        EOF
-        cat <<EOF > /etc/grafana/provisioning/dashboards/dashboard-provider.yaml
-        apiVersion: 1
-        providers:
-          - name: 'NPM Monitoring'
-            orgId: 1
-            folder: ''
-            type: file
-            disableDeletion: false
-            updateIntervalSeconds: 10
-            allowUiUpdates: true
-            options:
-              path: /etc/grafana/provisioning/dashboards
-        EOF
-        cp /etc/grafana/provisioning/dashboards/npm-monitoring-dashboard.json /etc/grafana/provisioning/dashboards/
-        /run.sh
     image: grafana/grafana:9.3.13
     ports:
       - "$grafana_port:3000"
@@ -412,6 +395,7 @@ services:
     volumes:
       - ./grafana-data:/var/lib/grafana
       - ./grafana-dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana-dashboards/datasources:/etc/grafana/provisioning/datasources
     restart: unless-stopped
 EOF
 
