@@ -2,15 +2,8 @@
 
 cd "$(dirname "$0")"
 
-echo "=========================================="
-echo "Nginx Proxy Manager Monitoring Setup"
-echo "=========================================="
-echo "This script will set up monitoring for NPM using:"
-echo "- Custom JSON log format for NPM"
-echo "- Promtail for log collection"
-echo "- Loki for log storage"
-echo "- Grafana for visualization"
-echo ""
+echo "Setting up NPM monitoring with Promtail, Loki, and Grafana"
+echo "This script will install the monitoring stack for NGINX Proxy Manager"
 
 # Function to prompt user for input and set default value if input is empty
 prompt() {
@@ -21,62 +14,27 @@ prompt() {
 }
 
 # Prompt user for necessary inputs
-npm_data_path=$(prompt "Enter the path to NPM data directory" "/storage/npm/data")
-monitoring_base_path=$(prompt "Enter the base path for monitoring data" "/storage/npm/monitoring")
+npm_logs_path=$(prompt "Enter the path to NPM logs" "/storage/npm/logs")
+monitoring_data_path=$(prompt "Enter the path for monitoring data" "/storage/monitoring")
 grafana_port=$(prompt "Enter Grafana port" "3000")
 loki_port=$(prompt "Enter Loki port" "3100")
 
-# Create monitoring directory structure
-echo "Creating monitoring directory structure..."
-mkdir -p "$monitoring_base_path"/{config-loki,config-promtail,grafana-data,loki-data}
+# Create necessary directories
+echo "Creating monitoring directories..."
+mkdir -p "$monitoring_data_path"
+mkdir -p "$monitoring_data_path/config-loki"
+mkdir -p "$monitoring_data_path/config-promtail"
+mkdir -p "$monitoring_data_path/grafana-data"
+mkdir -p "$monitoring_data_path/loki-data"
 
 # Set proper permissions
-echo "Setting proper permissions..."
-chown -R 472:472 "$monitoring_base_path/grafana-data"
-chown -R 10001:10001 "$monitoring_base_path/loki-data"
-
-# Create NPM custom logging configuration
-echo "Creating NPM custom logging configuration..."
-
-# Create custom directory in NPM data
-mkdir -p "$npm_data_path/nginx/custom"
-
-# Create http_top.conf with JSON log format
-cat <<EOF > "$npm_data_path/nginx/custom/http_top.conf"
-log_format json_analytics escape=json '{
-       "time_local": "$time_local",
-       "remote_addr": "$remote_addr",
-       "request_uri": "$request_uri",
-       "status": "$status",
-       "server_name": "$server_name",
-       "request_time": "$request_time",
-       "request_method": "$request_method",
-       "bytes_sent": "$bytes_sent",
-       "http_host": "$http_host",
-       "http_x_forwarded_for": "$http_x_forwarded_for",
-       "http_cookie": "$http_cookie",
-       "server_protocol": "$server_protocol",
-       "upstream_addr": "$upstream_addr",
-       "upstream_response_time": "$upstream_response_time",
-       "ssl_protocol": "$ssl_protocol",
-       "ssl_cipher": "$ssl_cipher",
-       "http_user_agent": "$http_user_agent",
-       "remote_user": "$remote_user"
-   }';
-EOF
-
-# Create server_proxy.conf for access logging
-cat <<EOF > "$npm_data_path/nginx/custom/server_proxy.conf"
-access_log $npm_data_path/logs/all_proxy_access.log json_analytics;
-error_log $npm_data_path/logs/all_proxy_error.log warn;
-EOF
-
-# Create logs directory if it doesn't exist
-mkdir -p "$npm_data_path/logs"
+echo "Setting permissions..."
+chown -R 472:472 "$monitoring_data_path/grafana-data"
+chown -R 10001:10001 "$monitoring_data_path/loki-data"
 
 # Create Loki configuration
 echo "Creating Loki configuration..."
-cat <<EOF > "$monitoring_base_path/config-loki/local-config.yaml"
+cat <<EOF > "$monitoring_data_path/config-loki/local-config.yaml"
 auth_enabled: false
 
 server:
@@ -112,7 +70,7 @@ EOF
 
 # Create Promtail configuration
 echo "Creating Promtail configuration..."
-cat <<EOF > "$monitoring_base_path/config-promtail/config.yaml"
+cat <<EOF > "$monitoring_data_path/config-promtail/config.yaml"
 server:
   http_listen_port: 9080
   grpc_listen_port: 0
@@ -133,10 +91,10 @@ scrape_configs:
       __path__: /var/log/*log
 EOF
 
-# Create docker-compose.yml for monitoring stack
-echo "Creating docker-compose.yml for monitoring stack..."
-cat <<EOF > "$monitoring_base_path/docker-compose.yml"
-version: "3.8"
+# Create docker-compose.yaml for monitoring stack
+echo "Creating docker-compose.yaml for monitoring stack..."
+cat <<EOF > "$monitoring_data_path/docker-compose.yaml"
+version: "3"
 
 networks:
   loki:
@@ -144,30 +102,26 @@ networks:
 services:
   loki:
     image: grafana/loki:2.8.0
-    container_name: npm-loki
     ports:
       - "$loki_port:3100"
     command: -config.file=/etc/loki/local-config.yaml
     networks:
       - loki
     volumes:
-      - $monitoring_base_path/loki-data:/loki
-      - $monitoring_base_path/config-loki:/etc/loki
+      - ./loki-data:/loki
+      - ./config-loki:/etc/loki
     restart: unless-stopped
 
   promtail:
     image: grafana/promtail:2.8.0
-    container_name: npm-promtail
     volumes:
-      - $npm_data_path/logs/:/var/log
-      - $monitoring_base_path/config-promtail/config.yaml:/etc/promtail/config.yaml
+      - $npm_logs_path:/var/log
+      - ./config-promtail/config.yaml:/etc/promtail/config.yaml
     networks:
       - loki
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:9.3.13
-    container_name: npm-grafana
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
       - GF_AUTH_ANONYMOUS_ENABLED=false
@@ -190,35 +144,52 @@ services:
           editable: false
         EOF
         /run.sh
+    image: grafana/grafana:9.3.13
     ports:
       - "$grafana_port:3000"
     networks:
       - loki
     volumes:
-      - $monitoring_base_path/grafana-data:/var/lib/grafana
+      - ./grafana-data:/var/lib/grafana
     restart: unless-stopped
 EOF
 
 # Create Grafana dashboard configuration
 echo "Creating Grafana dashboard configuration..."
-mkdir -p "$monitoring_base_path/grafana-data/dashboards"
+mkdir -p "$monitoring_data_path/grafana-dashboards"
 
-cat <<EOF > "$monitoring_base_path/grafana-data/dashboards/npm-monitoring.json"
+cat <<EOF > "$monitoring_data_path/grafana-dashboards/dashboard-provider.yaml"
+apiVersion: 1
+
+providers:
+  - name: 'NPM Monitoring'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+EOF
+
+# Create a comprehensive NPM monitoring dashboard
+cat <<EOF > "$monitoring_data_path/grafana-dashboards/npm-monitoring-dashboard.json"
 {
   "dashboard": {
     "id": null,
-    "title": "Nginx Proxy Manager Monitoring",
+    "title": "NPM Monitoring Dashboard",
     "tags": ["nginx", "proxy", "monitoring"],
     "style": "dark",
     "timezone": "browser",
     "panels": [
       {
         "id": 1,
-        "title": "Request Rate",
+        "title": "Total Requests",
         "type": "stat",
         "targets": [
           {
-            "expr": "rate({job=\"nginx-proxy-manager\"}[5m])",
+            "expr": "count_over_time({job=\"nginx-proxy-manager\"}[1h])",
             "refId": "A"
           }
         ],
@@ -245,7 +216,7 @@ cat <<EOF > "$monitoring_base_path/grafana-data/dashboards/npm-monitoring.json"
         "type": "piechart",
         "targets": [
           {
-            "expr": "sum by (status) (rate({job=\"nginx-proxy-manager\"}[5m]))",
+            "expr": "sum by (status) (count_over_time({job=\"nginx-proxy-manager\"}[5m]))",
             "refId": "A"
           }
         ],
@@ -258,11 +229,28 @@ cat <<EOF > "$monitoring_base_path/grafana-data/dashboards/npm-monitoring.json"
       },
       {
         "id": 3,
-        "title": "Top Requested Domains",
+        "title": "Requests per Second",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate({job=\"nginx-proxy-manager\"}[1m])",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "id": 4,
+        "title": "Top Requested URLs",
         "type": "table",
         "targets": [
           {
-            "expr": "topk(10, sum by (server_name) (rate({job=\"nginx-proxy-manager\"}[5m])))",
+            "expr": "topk(10, sum by (request_uri) (count_over_time({job=\"nginx-proxy-manager\"}[1h])))",
             "refId": "A"
           }
         ],
@@ -274,7 +262,7 @@ cat <<EOF > "$monitoring_base_path/grafana-data/dashboards/npm-monitoring.json"
         }
       },
       {
-        "id": 4,
+        "id": 5,
         "title": "Response Time Distribution",
         "type": "histogram",
         "targets": [
@@ -286,25 +274,8 @@ cat <<EOF > "$monitoring_base_path/grafana-data/dashboards/npm-monitoring.json"
         "gridPos": {
           "h": 8,
           "w": 12,
-          "x": 0,
-          "y": 16
-        }
-      },
-      {
-        "id": 5,
-        "title": "HTTP Methods",
-        "type": "barchart",
-        "targets": [
-          {
-            "expr": "sum by (request_method) (rate({job=\"nginx-proxy-manager\"}[5m]))",
-            "refId": "A"
-          }
-        ],
-        "gridPos": {
-          "h": 8,
-          "w": 12,
-          "x": 0,
-          "y": 24
+          "x": 12,
+          "y": 8
         }
       },
       {
@@ -319,6 +290,7 @@ cat <<EOF > "$monitoring_base_path/grafana-data/dashboards/npm-monitoring.json"
         ],
         "fieldConfig": {
           "defaults": {
+            "unit": "percent",
             "color": {
               "mode": "thresholds"
             },
@@ -328,54 +300,31 @@ cat <<EOF > "$monitoring_base_path/grafana-data/dashboards/npm-monitoring.json"
                 {"color": "yellow", "value": 1},
                 {"color": "red", "value": 5}
               ]
-            },
-            "unit": "percent"
+            }
           }
         },
         "gridPos": {
           "h": 8,
           "w": 6,
-          "x": 12,
-          "y": 0
+          "x": 0,
+          "y": 16
         }
       },
       {
         "id": 7,
         "title": "Bandwidth Usage",
-        "type": "timeseries",
+        "type": "graph",
         "targets": [
           {
-            "expr": "sum(rate({job=\"nginx-proxy-manager\"} | json | unwrap bytes_sent [5m]))",
-            "refId": "A"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "bytes"
-          }
-        },
-        "gridPos": {
-          "h": 8,
-          "w": 6,
-          "x": 12,
-          "y": 8
-        }
-      },
-      {
-        "id": 8,
-        "title": "Recent Logs",
-        "type": "logs",
-        "targets": [
-          {
-            "expr": "{job=\"nginx-proxy-manager\"}",
+            "expr": "sum(rate({job=\"nginx-proxy-manager\"} | json | unwrap bytes_sent [1m])) by (server_name)",
             "refId": "A"
           }
         ],
         "gridPos": {
           "h": 8,
-          "w": 24,
-          "x": 0,
-          "y": 32
+          "w": 18,
+          "x": 6,
+          "y": 16
         }
       }
     ],
@@ -388,103 +337,109 @@ cat <<EOF > "$monitoring_base_path/grafana-data/dashboards/npm-monitoring.json"
 }
 EOF
 
-# Create setup instructions
-echo "Creating setup instructions..."
-cat <<EOF > "$monitoring_base_path/README.md"
-# Nginx Proxy Manager Monitoring Setup
+# Update docker-compose to include dashboard provisioning
+cat <<EOF > "$monitoring_data_path/docker-compose.yaml"
+version: "3"
 
-This directory contains the monitoring setup for Nginx Proxy Manager using Grafana, Loki, and Promtail.
+networks:
+  loki:
 
-## Components
+services:
+  loki:
+    image: grafana/loki:2.8.0
+    ports:
+      - "$loki_port:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - loki
+    volumes:
+      - ./loki-data:/loki
+      - ./config-loki:/etc/loki
+    restart: unless-stopped
 
-- **Loki**: Log aggregation and storage
-- **Promtail**: Log collection and forwarding
-- **Grafana**: Visualization and dashboards
+  promtail:
+    image: grafana/promtail:2.8.0
+    volumes:
+      - $npm_logs_path:/var/log
+      - ./config-promtail/config.yaml:/etc/promtail/config.yaml
+    networks:
+      - loki
+    restart: unless-stopped
 
-## Setup Instructions
-
-1. **Restart NPM**: After running the setup script, restart your NPM container to apply the custom logging configuration:
-   \`\`\`bash
-   docker restart your-npm-container-name
-   \`\`\`
-
-2. **Start Monitoring Stack**: Navigate to this directory and start the monitoring services:
-   \`\`\`bash
-   cd $monitoring_base_path
-   docker-compose up -d
-   \`\`\`
-
-3. **Access Grafana**: Open your browser and go to:
-   - URL: http://your-server-ip:$grafana_port
-   - Default credentials: admin/admin
-
-4. **Import Dashboard**: 
-   - Go to Dashboards > Import
-   - Upload the file: grafana-data/dashboards/npm-monitoring.json
-   - Select Loki as the data source
-
-## Configuration Files
-
-- \`config-loki/local-config.yaml\`: Loki configuration
-- \`config-promtail/config.yaml\`: Promtail configuration
-- \`docker-compose.yml\`: Container orchestration
-- \`grafana-data/dashboards/npm-monitoring.json\`: Pre-configured dashboard
-
-## Log Locations
-
-- NPM logs: $npm_data_path/logs/
-- Loki data: $monitoring_base_path/loki-data/
-- Grafana data: $monitoring_base_path/grafana-data/
-
-## Troubleshooting
-
-1. **Check container status**:
-   \`\`\`bash
-   docker-compose ps
-   \`\`\`
-
-2. **View logs**:
-   \`\`\`bash
-   docker-compose logs -f [service-name]
-   \`\`\`
-
-3. **Verify log collection**:
-   \`\`\`bash
-   docker exec npm-promtail wc -l /var/log/all_proxy_access.log
-   \`\`\`
-
-## Ports
-
-- Grafana: $grafana_port
-- Loki: $loki_port
-- Promtail: 9080 (internal)
-
-## Security Notes
-
-- Change default Grafana credentials after first login
-- Consider setting up authentication for Loki
-- Restrict access to monitoring ports if needed
+  grafana:
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /etc/grafana/provisioning/datasources
+        mkdir -p /etc/grafana/provisioning/dashboards
+        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+        apiVersion: 1
+        datasources:
+        - name: Loki
+          type: loki
+          access: proxy 
+          orgId: 1
+          url: http://loki:3100
+          basicAuth: false
+          isDefault: true
+          version: 1
+          editable: false
+        EOF
+        cat <<EOF > /etc/grafana/provisioning/dashboards/dashboard-provider.yaml
+        apiVersion: 1
+        providers:
+          - name: 'NPM Monitoring'
+            orgId: 1
+            folder: ''
+            type: file
+            disableDeletion: false
+            updateIntervalSeconds: 10
+            allowUiUpdates: true
+            options:
+              path: /etc/grafana/provisioning/dashboards
+        EOF
+        cp /etc/grafana/provisioning/dashboards/npm-monitoring-dashboard.json /etc/grafana/provisioning/dashboards/
+        /run.sh
+    image: grafana/grafana:9.3.13
+    ports:
+      - "$grafana_port:3000"
+    networks:
+      - loki
+    volumes:
+      - ./grafana-data:/var/lib/grafana
+      - ./grafana-dashboards:/etc/grafana/provisioning/dashboards
+    restart: unless-stopped
 EOF
 
+# Start the monitoring stack
+echo "Starting monitoring stack..."
+cd "$monitoring_data_path"
+docker compose up -d
+
 echo ""
-echo "=========================================="
-echo "Setup Complete!"
-echo "=========================================="
+echo "Monitoring stack has been set up successfully!"
+echo ""
+echo "Services:"
+echo "- Grafana: http://your-server-ip:$grafana_port (admin/admin)"
+echo "- Loki: http://your-server-ip:$loki_port"
+echo ""
+echo "Configuration:"
+echo "- NPM logs path: $npm_logs_path"
+echo "- Monitoring data path: $monitoring_data_path"
 echo ""
 echo "Next steps:"
-echo "1. Restart your NPM container to apply custom logging:"
-echo "   docker restart your-npm-container-name"
+echo "1. Access Grafana at http://your-server-ip:$grafana_port"
+echo "2. Login with admin/admin"
+echo "3. The NPM Monitoring Dashboard should be automatically available"
+echo "4. You can also create custom queries using the Loki data source"
 echo ""
-echo "2. Start the monitoring stack:"
-echo "   cd $monitoring_base_path"
-echo "   docker-compose up -d"
-echo ""
-echo "3. Access Grafana at: http://your-server-ip:$grafana_port"
-echo "   Default credentials: admin/admin"
-echo ""
-echo "4. Import the dashboard from: $monitoring_base_path/grafana-data/dashboards/npm-monitoring.json"
-echo ""
-echo "Configuration files created in: $monitoring_base_path"
-echo ""
+echo "Example Loki queries:"
+echo "- {job=\"nginx-proxy-manager\"} - View all NPM logs"
+echo "- {job=\"nginx-proxy-manager\", status=\"404\"} - View 404 errors"
+echo "- {job=\"nginx-proxy-manager\"} | json | status >= 400 - View all errors"
 
-read -n 1 -s -r -p "Press any key to continue..." 
+read -n 1 -s -r -p "Press any key to continue..."

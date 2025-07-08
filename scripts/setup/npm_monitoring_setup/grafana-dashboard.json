@@ -2,17 +2,22 @@
   "dashboard": {
     "id": null,
     "title": "NPM Monitoring Dashboard",
-    "tags": ["npm", "nginx", "monitoring"],
+    "tags": ["nginx", "proxy", "monitoring", "npm"],
     "style": "dark",
     "timezone": "browser",
+    "refresh": "5s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
     "panels": [
       {
         "id": 1,
-        "title": "Request Rate (per minute)",
+        "title": "Total Requests (Last Hour)",
         "type": "stat",
         "targets": [
           {
-            "expr": "rate({job=\"npm_logs\"}[1m])",
+            "expr": "count_over_time({job=\"nginx-proxy-manager\"}[1h])",
             "refId": "A"
           }
         ],
@@ -22,19 +27,13 @@
               "mode": "palette-classic"
             },
             "custom": {
-              "displayMode": "gradient-gauge"
+              "displayMode": "list"
             },
             "mappings": [],
             "thresholds": {
               "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
+                {"color": "green", "value": null},
+                {"color": "red", "value": 80}
               ]
             }
           }
@@ -48,11 +47,11 @@
       },
       {
         "id": 2,
-        "title": "Response Status Codes",
-        "type": "piechart",
+        "title": "Requests per Second",
+        "type": "stat",
         "targets": [
           {
-            "expr": "sum by (status) (rate({job=\"npm_logs\"}[5m]))",
+            "expr": "sum(rate({job=\"nginx-proxy-manager\"}[1m]))",
             "refId": "A"
           }
         ],
@@ -62,21 +61,9 @@
               "mode": "palette-classic"
             },
             "custom": {
-              "displayMode": "pie"
+              "displayMode": "list"
             },
-            "mappings": [],
-            "thresholds": {
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
+            "unit": "reqps"
           }
         },
         "gridPos": {
@@ -88,157 +75,28 @@
       },
       {
         "id": 3,
-        "title": "Top Requested Domains",
-        "type": "table",
-        "targets": [
-          {
-            "expr": "topk(10, sum by (server_name) (rate({job=\"npm_logs\"}[5m])))",
-            "refId": "A"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "displayMode": "table"
-            },
-            "mappings": [],
-            "thresholds": {
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
-          }
-        },
-        "gridPos": {
-          "h": 8,
-          "w": 12,
-          "x": 12,
-          "y": 0
-        }
-      },
-      {
-        "id": 4,
-        "title": "Response Time Distribution",
-        "type": "histogram",
-        "targets": [
-          {
-            "expr": "histogram_quantile(0.95, sum(rate({job=\"npm_logs\"} | json | unwrap request_time [5m])) by (le))",
-            "refId": "A"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "displayMode": "histogram"
-            },
-            "mappings": [],
-            "thresholds": {
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
-          }
-        },
-        "gridPos": {
-          "h": 8,
-          "w": 12,
-          "x": 0,
-          "y": 8
-        }
-      },
-      {
-        "id": 5,
-        "title": "HTTP Methods",
-        "type": "barchart",
-        "targets": [
-          {
-            "expr": "sum by (request_method) (rate({job=\"npm_logs\"}[5m]))",
-            "refId": "A"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "displayMode": "barchart"
-            },
-            "mappings": [],
-            "thresholds": {
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            }
-          }
-        },
-        "gridPos": {
-          "h": 8,
-          "w": 12,
-          "x": 12,
-          "y": 8
-        }
-      },
-      {
-        "id": 6,
-        "title": "Error Rate (4xx/5xx)",
+        "title": "Error Rate (%)",
         "type": "stat",
         "targets": [
           {
-            "expr": "sum(rate({job=\"npm_logs\"} | json | status =~ \"4..|5..\" [5m]))",
+            "expr": "sum(rate({job=\"nginx-proxy-manager\", status=~\"4..|5..\"}[5m])) / sum(rate({job=\"nginx-proxy-manager\"}[5m])) * 100",
             "refId": "A"
           }
         ],
         "fieldConfig": {
           "defaults": {
             "color": {
-              "mode": "palette-classic"
+              "mode": "thresholds"
             },
             "custom": {
-              "displayMode": "gradient-gauge"
+              "displayMode": "list"
             },
-            "mappings": [],
+            "unit": "percent",
             "thresholds": {
               "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "yellow",
-                  "value": 0.1
-                },
-                {
-                  "color": "red",
-                  "value": 1
-                }
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 1},
+                {"color": "red", "value": 5}
               ]
             }
           }
@@ -246,17 +104,130 @@
         "gridPos": {
           "h": 8,
           "w": 6,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "id": 4,
+        "title": "Average Response Time",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(rate({job=\"nginx-proxy-manager\"} | json | unwrap request_time [5m]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "displayMode": "list"
+            },
+            "unit": "s",
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.5},
+                {"color": "red", "value": 1}
+              ]
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        }
+      },
+      {
+        "id": 5,
+        "title": "Response Status Codes Distribution",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (status) (count_over_time({job=\"nginx-proxy-manager\"}[5m]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 8,
           "x": 0,
-          "y": 16
+          "y": 8
+        }
+      },
+      {
+        "id": 6,
+        "title": "Requests per Second Over Time",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum(rate({job=\"nginx-proxy-manager\"}[1m]))",
+            "refId": "A",
+            "legendFormat": "Requests/sec"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              },
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "unit": "reqps"
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 16,
+          "x": 8,
+          "y": 8
         }
       },
       {
         "id": 7,
-        "title": "Bandwidth Usage (bytes sent)",
-        "type": "timeseries",
+        "title": "Top Requested URLs",
+        "type": "table",
         "targets": [
           {
-            "expr": "sum(rate({job=\"npm_logs\"} | json | unwrap bytes_sent [5m]))",
+            "expr": "topk(10, sum by (request_uri) (count_over_time({job=\"nginx-proxy-manager\"}[1h])))",
             "refId": "A"
           }
         ],
@@ -266,39 +237,26 @@
               "mode": "palette-classic"
             },
             "custom": {
-              "displayMode": "line"
-            },
-            "mappings": [],
-            "thresholds": {
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
+              "align": "auto",
+              "displayMode": "auto"
             }
           }
         },
         "gridPos": {
           "h": 8,
           "w": 12,
-          "x": 6,
+          "x": 0,
           "y": 16
         }
       },
       {
         "id": 8,
-        "title": "Recent Logs",
-        "type": "logs",
+        "title": "Top Server Names",
+        "type": "table",
         "targets": [
           {
-            "expr": "{job=\"npm_logs\"}",
-            "refId": "A",
-            "maxLines": 100
+            "expr": "topk(10, sum by (server_name) (count_over_time({job=\"nginx-proxy-manager\"}[1h])))",
+            "refId": "A"
           }
         ],
         "fieldConfig": {
@@ -307,62 +265,276 @@
               "mode": "palette-classic"
             },
             "custom": {
-              "displayMode": "logs"
-            },
-            "mappings": [],
-            "thresholds": {
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
+              "align": "auto",
+              "displayMode": "auto"
             }
           }
         },
         "gridPos": {
           "h": 8,
-          "w": 24,
+          "w": 12,
+          "x": 12,
+          "y": 16
+        }
+      },
+      {
+        "id": 9,
+        "title": "Response Time Distribution",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate({job=\"nginx-proxy-manager\"} | json | unwrap request_time [5m])) by (le))",
+            "refId": "A",
+            "legendFormat": "95th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.50, sum(rate({job=\"nginx-proxy-manager\"} | json | unwrap request_time [5m])) by (le))",
+            "refId": "B",
+            "legendFormat": "50th percentile"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              },
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "unit": "s"
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
           "x": 0,
           "y": 24
         }
+      },
+      {
+        "id": 10,
+        "title": "Bandwidth Usage (Bytes/sec)",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum(rate({job=\"nginx-proxy-manager\"} | json | unwrap bytes_sent [1m])) by (server_name)",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "vis": false
+              },
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "unit": "Bps"
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 24
+        }
+      },
+      {
+        "id": 11,
+        "title": "HTTP Methods Distribution",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (request_method) (count_over_time({job=\"nginx-proxy-manager\"}[5m]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 8,
+          "x": 0,
+          "y": 32
+        }
+      },
+      {
+        "id": 12,
+        "title": "SSL Protocol Distribution",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (ssl_protocol) (count_over_time({job=\"nginx-proxy-manager\"}[5m]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 8,
+          "x": 8,
+          "y": 32
+        }
+      },
+      {
+        "id": 13,
+        "title": "Top User Agents",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "topk(10, sum by (http_user_agent) (count_over_time({job=\"nginx-proxy-manager\"}[1h])))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "align": "auto",
+              "displayMode": "auto"
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 8,
+          "x": 16,
+          "y": 32
+        }
       }
     ],
-    "time": {
-      "from": "now-1h",
-      "to": "now"
-    },
-    "timepicker": {},
     "templating": {
       "list": [
         {
-          "name": "server_name",
-          "type": "query",
-          "query": "label_values(server_name)",
-          "refresh": 2,
+          "current": {
+            "selected": false,
+            "text": "All",
+            "value": "$__all"
+          },
+          "datasource": "Loki",
+          "definition": "label_values(server_name)",
+          "hide": 0,
           "includeAll": true,
-          "multi": true
+          "label": "Server Name",
+          "multi": true,
+          "name": "server_name",
+          "options": [],
+          "query": "label_values(server_name)",
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "type": "query"
         },
         {
-          "name": "status",
-          "type": "query", 
-          "query": "label_values(status)",
-          "refresh": 2,
+          "current": {
+            "selected": false,
+            "text": "All",
+            "value": "$__all"
+          },
+          "datasource": "Loki",
+          "definition": "label_values(status)",
+          "hide": 0,
           "includeAll": true,
-          "multi": true
+          "label": "Status Code",
+          "multi": true,
+          "name": "status",
+          "options": [],
+          "query": "label_values(status)",
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "type": "query"
         }
       ]
     },
     "annotations": {
       "list": []
     },
-    "refresh": "5s",
-    "schemaVersion": 27,
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "links": [],
+    "liveNow": false,
+    "schemaVersion": 38,
+    "style": "dark",
+    "tags": ["nginx", "proxy", "monitoring", "npm"],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "NPM Monitoring Dashboard",
+    "uid": "npm-monitoring",
     "version": 1,
-    "links": []
+    "weekStart": ""
   }
-} 
+}
