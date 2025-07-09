@@ -60,6 +60,7 @@ Admin services :
 - [x] FileBrowser
 - [x] Vaultwarden
 - [x] Dead Man's Switch
+- [x] NPM Monitoring (Grafana + Loki + Promtail)
 
 User services :
 
@@ -94,6 +95,8 @@ User services :
 | Dead Man's Switch             | 3000                                      |
 | Vaultwarden                   | 8081                                      |
 | Static Website                | 8082                                      |
+| Grafana (NPM Monitoring)      | 3000                                      |
+| Loki (NPM Monitoring)         | 3100                                      |
 
 ## Default Credentials
 
@@ -101,6 +104,7 @@ User services :
 | --------------------- | --------------------- | -------------------------------------------------------- |
 | NGINX Proxy Manager   | `admin@example.com`   | `changeme`                                               |
 | FileBrowser           | `admin`               | Shown in the docker logs on first container start.       |
+| Grafana               | `admin`               | `admin`                                                |
 
 ## Sources
 

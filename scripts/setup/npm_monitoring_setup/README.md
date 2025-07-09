@@ -47,6 +47,17 @@ This script will:
 - Configure log collection from NPM
 - Set up a comprehensive monitoring dashboard
 - Create necessary directories and set proper permissions
+- Prompt for configurable ports (Grafana: 3000, Loki: 3100)
+- Prompt for NPM logs path and monitoring data path
+
+## Setup Configuration
+
+During the setup process, you will be prompted for:
+
+- **NPM logs path**: Path to NPM log files (default: `/storage/npm/logs`)
+- **Monitoring data path**: Path for monitoring stack data (default: `/storage/monitoring`)
+- **Grafana port**: Port for Grafana web interface (default: `3000`)
+- **Loki port**: Port for Loki API (default: `3100`)
 
 ## Configuration Details
 
@@ -77,12 +88,12 @@ The NPM setup creates two custom configuration files:
 ## Accessing the Monitoring Tools
 
 ### Grafana Dashboard
-- **URL**: `http://your-server-ip:3000`
+- **URL**: `http://your-server-ip:3000` (default port, configurable during setup)
 - **Default credentials**: `admin/admin`
 - **Dashboard**: "NPM Monitoring Dashboard" (automatically available)
 
 ### Loki API
-- **URL**: `http://your-server-ip:3100`
+- **URL**: `http://your-server-ip:3100` (default port, configurable during setup)
 - **Purpose**: Direct access to log data and queries
 
 ## Dashboard Features
