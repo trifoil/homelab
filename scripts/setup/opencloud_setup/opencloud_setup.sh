@@ -20,6 +20,9 @@ volume_config=$(prompt "Enter the volume path for OpenCloud config" "/storage/op
 volume_data=$(prompt "Enter the volume path for OpenCloud data" "/storage/opencloud/data")
 volume_apps=$(prompt "Enter the volume path for OpenCloud apps" "/storage/opencloud/apps")
 
+# Set local domain for development
+local_domain="cloud.opencloud.test"
+
 # Create necessary directories
 echo "Creating directories..."
 mkdir -p "$volume_config"
@@ -75,9 +78,9 @@ services:
       opencloud-net:
     entrypoint:
       - /bin/sh
-    command: ["-c", "opencloud init || true; opencloud server"]
+    command: ["-c", "opencloud init --insecure true || true; opencloud server"]
     environment:
-      OC_URL: http://localhost:9200
+      OC_URL: 
       OC_LOG_LEVEL: info
       OC_LOG_COLOR: "false"
       OC_LOG_PRETTY: "false"
@@ -99,6 +102,11 @@ services:
       OC_PASSWORD_POLICY_MIN_DIGITS: "1"
       OC_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS: "1"
       OC_PROXY_HTTP_ADDR: "0.0.0.0:9200"
+      TZ: "UTC"
+      PUID: "1000"
+      PGID: "1000"
+      OC_CONFIG_DIR: /etc/opencloud/config
+      OC_DATA_DIR: /var/lib/opencloud/data
     volumes:
       - $volume_config/csp.yaml:/etc/opencloud/csp.yaml
       - $volume_config/banned-password-list.txt:/etc/opencloud/banned-password-list.txt
@@ -106,7 +114,7 @@ services:
       - $volume_data:/var/lib/opencloud
       - $volume_apps:/var/lib/opencloud/web/assets/apps
     ports:
-      - '9200:9200'
+      - '127.0.0.1:9200:9200'
     logging:
       driver: local
     privileged: true
@@ -134,5 +142,6 @@ echo "Admin credentials: admin / $admin_password"
 echo ""
 echo "OpenCloud is running in local development mode."
 echo "Access it directly at http://localhost:9200"
+echo "The service is bound to localhost only for security."
 
 read -n 1 -s -r -p "Done. Press any key to continue..."
