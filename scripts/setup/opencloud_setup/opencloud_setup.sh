@@ -52,8 +52,7 @@ services:
     container_name: OpenCloud
     image: 'opencloudeu/opencloud-rolling:latest'
     restart: always
-    networks:
-      opencloud-net:
+
     entrypoint:
       - /bin/sh
     command: ["-c", "opencloud init --insecure true || true; opencloud server"]
@@ -98,17 +97,12 @@ services:
 volumes:
   opencloud-config:
   opencloud-data:
-
-networks:
-  opencloud-net:
-    external: true
 EOF
 
 echo "The docker-compose.yml has been created successfully."
 echo "OpenCloud configuration has been set up for external proxy deployment."
 
-# Create the external network if it doesn't exist
-docker network create opencloud-net 2>/dev/null || echo "Network opencloud-net already exists"
+
 
 docker compose up -d
 
