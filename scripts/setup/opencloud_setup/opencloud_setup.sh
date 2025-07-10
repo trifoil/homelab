@@ -29,24 +29,14 @@ mkdir -p "$volume_config"
 mkdir -p "$volume_data"
 mkdir -p "$volume_apps"
 
+# Remove any existing files that might be directories
+rm -f "$volume_config/csp.yaml"
+rm -f "$volume_config/banned-password-list.txt"
+
 # Create custom configuration directory
 mkdir -p "$volume_config/custom"
 
-# Create CSP configuration file
-cat <<EOF > "$volume_config/csp.yaml"
-default-src: "'self'"
-script-src: "'self' 'unsafe-inline' 'unsafe-eval'"
-style-src: "'self' 'unsafe-inline'"
-img-src: "'self' data: blob:"
-font-src: "'self'"
-connect-src: "'self'"
-frame-src: "'self'"
-object-src: "'none'"
-base-uri: "'self'"
-form-action: "'self'"
-frame-ancestors: "'self'"
-upgrade-insecure-requests: true
-EOF
+
 
 
 
@@ -79,7 +69,7 @@ services:
       IDM_CREATE_DEMO_USERS: "false"
       IDM_ADMIN_PASSWORD: "$admin_password"
       FRONTEND_ARCHIVER_MAX_SIZE: "10000000000"
-      PROXY_CSP_CONFIG_FILE_LOCATION: /etc/opencloud/csp.yaml
+      PROXY_CSP_CONFIG_FILE_LOCATION: ""
       OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: ""
       OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD: "true"
       OC_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD: "true"
@@ -96,7 +86,6 @@ services:
       OC_CONFIG_DIR: /etc/opencloud/config
       OC_DATA_DIR: /var/lib/opencloud/data
     volumes:
-      - $volume_config/csp.yaml:/etc/opencloud/csp.yaml
       - $volume_config:/etc/opencloud
       - $volume_data:/var/lib/opencloud
       - $volume_apps:/var/lib/opencloud/web/assets/apps
