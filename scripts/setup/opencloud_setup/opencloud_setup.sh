@@ -90,7 +90,8 @@ services:
       - $volume_apps:/var/lib/opencloud/web/assets/apps
     ports:
       - '127.0.0.1:9200:9200'
-
+    networks:
+      - bridge
     logging:
       driver: local
     privileged: true
@@ -98,6 +99,10 @@ services:
 volumes:
   opencloud-config:
   opencloud-data:
+
+networks:
+  bridge:
+    external: true
 EOF
 
 echo "The docker-compose.yml has been created successfully."
