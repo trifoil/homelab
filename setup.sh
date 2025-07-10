@@ -31,6 +31,7 @@ display_menu() {
     echo "| 15. Setup Vaultwarden                                                 |"
     echo "| 16. Setup Static Website                                              |"
     echo "| 17. Setup NPM Monitoring (Grafana + Loki + Promtail)                  |"
+    echo "| 18. Setup OpenCloud                                                   |"
     echo "|-----------------------------------------------------------------------|"
     echo "|  q. Exit                                                              |"
     echo "|-----------------------------------------------------------------------|"
@@ -109,6 +110,10 @@ setup_npm_monitoring(){
     sh scripts/setup/npm_monitoring_setup/npm_monitoring_setup.sh
 }
 
+setup_opencloud(){
+    sh scripts/setup/opencloud_setup/opencloud_setup.sh
+}
+
 main() {
     while true; do
         display_menu
@@ -132,6 +137,7 @@ main() {
             15) setup_vaultwarden ;;
             16) setup_static_website ;;
             17) setup_npm_monitoring ;;
+            18) setup_opencloud ;;
             q) clear && echo "Bye loser!" && exit;;
             *) clear && echo "Invalid choice. Please enter a valid option." ;;
         esac

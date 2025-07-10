@@ -73,6 +73,8 @@ User services :
 - [x] Vanilla JS Website
 - [x] SOTF (Sons of the Forest) Server
 - [x] Static Website
+- [ ] Mattermost
+- [ ] OpenCloud
 
 ## Default Ports
 
@@ -97,6 +99,7 @@ User services :
 | Static Website                | 8082                                      |
 | Grafana (NPM Monitoring)      | 3000                                      |
 | Loki (NPM Monitoring)         | 3100                                      |
+| OpenCloud                     | 9200                                      |
 
 ## Default Credentials
 
@@ -105,6 +108,7 @@ User services :
 | NGINX Proxy Manager   | `admin@example.com`   | `changeme`                                               |
 | FileBrowser           | `admin`               | Shown in the docker logs on first container start.       |
 | Grafana               | `admin`               | `admin`                                                |
+| OpenCloud             | `admin`               | Set during installation (default: `opencloud`)           |
 
 ## Sources
 
