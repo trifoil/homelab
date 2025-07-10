@@ -31,18 +31,18 @@ mkdir -p "$volume_config/custom"
 
 # Create CSP configuration file
 cat <<EOF > "$volume_config/csp.yaml"
-default-src 'self';
-script-src 'self' 'unsafe-inline' 'unsafe-eval';
-style-src 'self' 'unsafe-inline';
-img-src 'self' data: blob:;
-font-src 'self';
-connect-src 'self';
-frame-src 'self';
-object-src 'none';
-base-uri 'self';
-form-action 'self';
-frame-ancestors 'self';
-upgrade-insecure-requests;
+default-src: "'self'"
+script-src: "'self' 'unsafe-inline' 'unsafe-eval'"
+style-src: "'self' 'unsafe-inline'"
+img-src: "'self' data: blob:"
+font-src: "'self'"
+connect-src: "'self'"
+frame-src: "'self'"
+object-src: "'none'"
+base-uri: "'self'"
+form-action: "'self'"
+frame-ancestors: "'self'"
+upgrade-insecure-requests: true
 EOF
 
 # Create banned password list
@@ -97,6 +97,7 @@ services:
       OC_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS: "1"
       OC_PASSWORD_POLICY_MIN_DIGITS: "1"
       OC_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS: "1"
+      OC_PROXY_HTTP_ADDR: "0.0.0.0:9200"
     volumes:
       - $volume_config/csp.yaml:/etc/opencloud/csp.yaml
       - $volume_config/banned-password-list.txt:/etc/opencloud/banned-password-list.txt
