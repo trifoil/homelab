@@ -46,7 +46,7 @@ upgrade-insecure-requests;
 EOF
 
 # Create banned password list
-cat <<EOF > "$volume_config/banned-password-list.txt
+cat <<EOF > "$volume_config/banned-password-list.txt"
 password
 123456
 123456789
