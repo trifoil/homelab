@@ -1,0 +1,33 @@
+services:
+  opencloud-rolling:
+    container_name: opencloud
+    hostname: opencloud
+    restart: always
+    volumes:
+      - /var/lib/opencloud:/var/lib/opencloud
+      - /etc/opencloud/config:/etc/opencloud/config
+    image: opencloudeu/opencloud-rolling
+    ports:
+      - 127.0.0.1:9200:9200
+    entrypoint:
+      - /bin/sh
+    command: ["-c", "opencloud init --insecure true || true; opencloud server"]
+    environment:
+      IDM_CREATE_DEMO_USERS: false
+      OC_URL: 
+      TZ: America/New_York
+      PUID: 1000
+      PGID: 1000
+      OC_LOG_LEVEL: trace
+      OC_LOG_FILE: /var/lib/opencloud/opencloud.log
+      OC_CONFIG_DIR: /etc/opencloud/config
+      OC_DATA_DIR: /var/lib/opencloud/data
+      NOTIFICATIONS_SMTP_HOST: 
+      NOTIFICATIONS_SMTP_PORT: "587"
+      NOTIFICATIONS_SMTP_SENDER: "OpenCloud Notifications <xxx@sssss.com>"
+      NOTIFICATIONS_SMTP_USERNAME: "xxxxx@xxxxxmail.com"
+      NOTIFICATIONS_SMTP_PASSWORD: "password-here"
+      NOTIFICATIONS_SMTP_AUTHENTICATION: "plain"
+      NOTIFICATIONS_SMTP_TRANSPORT_ENCRYPTION: "starttls"
+      NOTIFICATIONS_SMTP_INSECURE: "true"
+      OC_ADD_RUN_SERVICES: "notifications"
