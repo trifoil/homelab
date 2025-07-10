@@ -48,19 +48,7 @@ frame-ancestors: "'self'"
 upgrade-insecure-requests: true
 EOF
 
-# Create banned password list
-cat <<EOF > "$volume_config/banned-password-list.txt"
-password
-123456
-123456789
-qwerty
-abc123
-password123
-admin
-root
-user
-test
-EOF
+
 
 # Set proper permissions
 chown -R 1000:1000 "$volume_config"
@@ -92,7 +80,7 @@ services:
       IDM_ADMIN_PASSWORD: "$admin_password"
       FRONTEND_ARCHIVER_MAX_SIZE: "10000000000"
       PROXY_CSP_CONFIG_FILE_LOCATION: /etc/opencloud/csp.yaml
-      OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: banned-password-list.txt
+      OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: ""
       OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD: "true"
       OC_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD: "true"
       OC_PASSWORD_POLICY_DISABLED: "false"
@@ -109,7 +97,6 @@ services:
       OC_DATA_DIR: /var/lib/opencloud/data
     volumes:
       - $volume_config/csp.yaml:/etc/opencloud/csp.yaml
-      - $volume_config/banned-password-list.txt:/etc/opencloud/banned-password-list.txt
       - $volume_config:/etc/opencloud
       - $volume_data:/var/lib/opencloud
       - $volume_apps:/var/lib/opencloud/web/assets/apps
