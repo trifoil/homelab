@@ -83,6 +83,7 @@ services:
       OC_LOG_PRETTY: "false"
       PROXY_TLS: "false"
       OC_INSECURE: "true"
+      OC_PROXY_INSECURE: "true"
       PROXY_ENABLE_BASIC_AUTH: "false"
       IDM_CREATE_DEMO_USERS: "false"
       IDM_ADMIN_PASSWORD: "$admin_password"
@@ -128,10 +129,10 @@ docker network create opencloud-net 2>/dev/null || echo "Network opencloud-net a
 docker compose up -d
 
 echo "OpenCloud is starting up..."
-echo "You can access OpenCloud at http://your-server-ip:9200"
+echo "You can access OpenCloud at http://localhost:9200"
 echo "Admin credentials: admin / $admin_password"
 echo ""
-echo "OpenCloud is configured to run behind an external proxy."
-echo "Configure your reverse proxy to forward requests to port 9200."
+echo "OpenCloud is running in local development mode."
+echo "Access it directly at http://localhost:9200"
 
 read -n 1 -s -r -p "Done. Press any key to continue..."
