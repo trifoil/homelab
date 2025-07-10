@@ -90,6 +90,7 @@ services:
       - $volume_apps:/var/lib/opencloud/web/assets/apps
     ports:
       - '127.0.0.1:9200:9200'
+
     logging:
       driver: local
     privileged: true
