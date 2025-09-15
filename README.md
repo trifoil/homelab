@@ -119,3 +119,4 @@ User services :
 * https://github.com/OpenVPN/as-docker
 * https://github.com/pgollor/gitbucket-docker/blob/master/docker-compose.yml
 * https://ocserv.openconnect-vpn.net/packages
+* https://docs.frigate.video/frigate/installation/
