@@ -1,0 +1,19 @@
+services:
+  opencloud-rolling:
+    container_name: opencloud
+    volumes:
+      - opencloud-data:/var/lib/opencloud
+      - opencloud-config:/etc/opencloud
+    image: opencloudeu/opencloud-rolling
+    ports:
+      - 127.0.0.1:9200:9200
+    entrypoint:
+      - /bin/sh
+    command: ["-c", "opencloud init --insecure true || true; opencloud server"]
+    environment:
+      - IDM_CREATE_DEMO_USERS=false
+      - OC_URL=https://10.10.2.115
+volumes:
+  opencloud-data:
+  opencloud-config:
+
