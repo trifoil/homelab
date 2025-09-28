@@ -120,3 +120,7 @@ User services :
 * https://github.com/pgollor/gitbucket-docker/blob/master/docker-compose.yml
 * https://ocserv.openconnect-vpn.net/packages
 * https://docs.frigate.video/frigate/installation/
+* https://github.com/Dolibarr/dolibarr-docker
+* https://github.com/checkmk/checkmk
+* https://github.com/blakeblackshear/frigate/blob/dev/docker-compose.yml
+
