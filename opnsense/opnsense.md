@@ -194,7 +194,11 @@ Note : not up to date (1 to 1 reflection, etc...)
 
 ### VPN 
 
-1. Server access vpn    
+Instances: in the wireguard configuration these are called “interfaces” and they describe how the virtual wgX device on our end is configured in terms of addressing and cryptography.
+
+Peers: these are the clients that are allowed to connect to us, described by their optional remote address including the networks that are allowed to pass through the tunnel. Peers belong to one or more instances.
+
+1. Wireguard instance config  
 
       Go to ```VPN > WireGuard > Instances```
 
@@ -203,14 +207,46 @@ Note : not up to date (1 to 1 reflection, etc...)
 |Name|Input field|
 |:---|:---|
 |Enabled|```checked```|
-|Name|server_vpn|
+|Name|vpn0|
 |Public key| leave blank (or add pubkey)|
-| Private key| leave blank (or add pkey)|
+|Private key| leave blank (or add pkey)|
 |Listen port| 51822 (2 because server vlan)|
-|Tunnel address| 10.10.2.253 |
+|Tunnel address| 10.11.2.1/24 (cannot be on any network you are connecting to or from)|
 |Peers| leave blank initially |
 | Disable routes|```unchecked```|
 
+2. Client peer config (generator)
+
+      Go to ```VPN > WireGuard > Peer generator```
+
+
+|Name|Input field|
+|:---|:---|
+|Instance|vpn0|
+|Endpoint|91.179.88.45:51822|
+|Name|vpn0usr0|
+|Public key|automatically filled|
+|Private key|automatically filled|
+||automatically filled|
+|Pre-shared| Leave blank, or generate one for extra security|
+|Allowed IPs|0.0.0.0/0,::/0|
+|DNS Servers|10.11.2.1 (wireguard tunnel address)|
+
+Click apply !!!!
+
+3. Enable interface
+
+      Go to ```Interfaces > Assignments```
+
+      Assign a new interface : ```wg0 (WireGuard - vpn0)``` and click Add
+      
+      Go to ```Interfaces > [vpn0]```
+
+      Tick both ```Enable Interface``` and ```Prevent interface removal```
+
+      Save
+
+      
 
 
 
