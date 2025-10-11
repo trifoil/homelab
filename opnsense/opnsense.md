@@ -246,7 +246,18 @@ Click apply !!!!
 
       Save
 
-      
+4. Firewall rules (WAN interface)
+
+   Go to ```Firewall > Rules > vpn0```
+
+   Add a rule that allows anything 
+   
+
+5. Firewall rules (vpn0 interface)
+
+   Go to ```Firewall > Rules > WAN```
+
+   
 
 
 
