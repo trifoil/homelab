@@ -257,9 +257,12 @@ Click apply !!!!
 
    Go to ```Firewall > Rules > WAN```
 
-   
-
-
+   Add a rule that has :
+   * Protocol : UDP
+   * Source : any
+   * Destination : WAN address
+   * Destination port : 51822
+   * Description : Allow wireguard VPN server access
 
 ### Note
 
